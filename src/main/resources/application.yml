@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test;MODE=MySQL
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:static/data/data.sql
+      encoding: utf-8
+  jpa:
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: create
+    defer-datasource-initialization: true
+
+server:
+  servlet:
+      encoding:
+          force-response: true
+
