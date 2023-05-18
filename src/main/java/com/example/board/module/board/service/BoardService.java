@@ -32,7 +32,7 @@ public class BoardService {
         return null;
     }
 
-    public Board update(BoardUpdateRequest request) {
+    public Board update(BoardUpdateRequest request, Board board) {
         return null;
     }
 

@@ -28,13 +28,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
 
-
     @Bean
     BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
-
 
     public static class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
         @Override
@@ -82,7 +79,7 @@ public class SecurityConfig {
         });
 
         // 11. 인증, 권한 필터 설정
-        http.authorizeRequests(
+        http.authorizeHttpRequests(
                 authorize -> authorize
                         .requestMatchers(HttpMethod.GET,"/board", "/board/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()

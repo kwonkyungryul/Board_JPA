@@ -27,11 +27,11 @@ public class UserController {
     }
 
 
-    @GetMapping
+    @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(
-        @AuthenticationPrincipal MyUserDetails myUserDetails
-    ) {
-        Optional<User> optionalUser = userService.getUser(myUserDetails);
+//        @AuthenticationPrincipal MyUserDetails myUserDetails,
+        @PathVariable Long id) {
+        Optional<User> optionalUser = userService.getUser(id);
         if (optionalUser.isEmpty()) {
             throw new Exception400(UserConst.notFound);
         }

@@ -53,7 +53,7 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<BoardResponse> saveBoard(
-            @Valid BoardSaveRequest request,
+            @Valid @RequestBody BoardSaveRequest request,
             Errors errors
     ) {
 
@@ -69,7 +69,7 @@ public class BoardController {
     @PutMapping("/{id}")
     public ResponseEntity<BoardResponse> saveBoard(
             @PathVariable Long id,
-            @Valid BoardUpdateRequest request,
+            @Valid @RequestBody BoardUpdateRequest request,
             Errors errors
     ) {
 
@@ -82,7 +82,7 @@ public class BoardController {
             throw new Exception400(BoardConst.notFound);
         }
 
-        Board board = boardService.update(request);
+        Board board = boardService.update(request, optionalBoard.get());
 
 
         return ResponseEntity.ok(board.toResponse());
