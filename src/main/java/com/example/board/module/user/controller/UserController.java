@@ -2,22 +2,19 @@ package com.example.board.module.user.controller;
 
 import com.example.board.auth.session.MyUserDetails;
 import com.example.board.module.common.exception.Exception400;
-import com.example.board.module.common.exception.Exception401;
 import com.example.board.module.user.dto.UserDTO;
 import com.example.board.module.user.entity.User;
+import com.example.board.module.user.enums.UserConst;
 import com.example.board.module.user.request.UserSaveRequest;
 import com.example.board.module.user.response.UserResponse;
 import com.example.board.module.user.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -31,14 +28,14 @@ public class UserController {
 
 
     @GetMapping
-    public ResponseEntity<UserDTO> getMyInfo(
+    public ResponseEntity<UserDTO> getUser(
         @AuthenticationPrincipal MyUserDetails myUserDetails
     ) {
-        if (myUserDetails == null) {
-            throw new Exception401("인증이 되지 않았습니다.");
+        Optional<User> optionalUser = userService.getUser(myUserDetails);
+        if (optionalUser.isEmpty()) {
+            throw new Exception400(UserConst.notFound);
         }
-
-        return ResponseEntity.ok(userService.getMyInfo(myUserDetails));
+        return ResponseEntity.ok(optionalUser.get().toDTO());
     }
 
     @PostMapping

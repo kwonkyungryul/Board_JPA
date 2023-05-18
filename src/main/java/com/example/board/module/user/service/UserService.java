@@ -8,6 +8,8 @@ import com.example.board.module.user.request.UserSaveRequest;
 import com.example.board.module.user.response.UserResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -16,7 +18,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public UserDTO getMyInfo(MyUserDetails myUserDetails) {
+    public Optional<User> getUser(MyUserDetails myUserDetails) {
         return null;
     }
 

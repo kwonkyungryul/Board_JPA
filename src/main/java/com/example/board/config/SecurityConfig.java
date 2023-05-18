@@ -1,31 +1,40 @@
 package com.example.board.config;
 
 import com.example.board.auth.jwt.MyJwtAuthorizationFilter;
+import com.example.board.auth.session.MyUserDetailsService;
 import com.example.board.module.common.exception.Exception401;
 import com.example.board.module.common.exception.Exception403;
+import com.example.board.module.user.repository.UserRepository;
 import com.example.board.util.MyFilterResponseUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-@Configuration
 @Slf4j
+@Configuration
 public class SecurityConfig {
+
 
     @Bean
     BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+
 
     public static class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
         @Override
@@ -74,7 +83,9 @@ public class SecurityConfig {
 
         // 11. 인증, 권한 필터 설정
         http.authorizeRequests(
-                authorize -> authorize.requestMatchers(HttpMethod.GET,"/board", "/board/{id}").permitAll()
+                authorize -> authorize
+                        .requestMatchers(HttpMethod.GET,"/board", "/board/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
         );
