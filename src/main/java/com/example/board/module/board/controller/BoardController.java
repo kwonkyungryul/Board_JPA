@@ -1,6 +1,5 @@
 package com.example.board.module.board.controller;
 
-import com.example.board.auth.session.MyUserDetails;
 import com.example.board.module.board.dto.BoardDTO;
 import com.example.board.module.board.entity.Board;
 import com.example.board.module.board.enums.BoardConst;
@@ -9,14 +8,11 @@ import com.example.board.module.board.request.BoardUpdateRequest;
 import com.example.board.module.board.response.BoardResponse;
 import com.example.board.module.board.service.BoardService;
 import com.example.board.module.common.exception.Exception400;
-import com.example.board.module.common.exception.Exception401;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,14 +53,9 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<BoardResponse> saveBoard(
-            @Valid BoardSaveRequest request,
-            Errors errors,
-            @AuthenticationPrincipal MyUserDetails myUserDetails
+            @Valid @RequestBody BoardSaveRequest request,
+            Errors errors
     ) {
-
-        if (myUserDetails == null) {
-            throw new Exception401("인증이 되지 않았습니다.");
-        }
 
         if (errors.hasErrors()) {
             throw new Exception400(errors.getAllErrors().get(0).getDefaultMessage());
@@ -78,13 +69,9 @@ public class BoardController {
     @PutMapping("/{id}")
     public ResponseEntity<BoardResponse> saveBoard(
             @PathVariable Long id,
-            @Valid BoardUpdateRequest request,
-            Errors errors,
-            @AuthenticationPrincipal MyUserDetails myUserDetails
+            @Valid @RequestBody BoardUpdateRequest request,
+            Errors errors
     ) {
-        if (myUserDetails == null) {
-            throw new Exception401("인증이 되지 않았습니다.");
-        }
 
         if (errors.hasErrors()) {
             throw new Exception400(errors.getAllErrors().get(0).getDefaultMessage());
@@ -95,7 +82,7 @@ public class BoardController {
             throw new Exception400(BoardConst.notFound);
         }
 
-        Board board = boardService.update(request);
+        Board board = boardService.update(request, optionalBoard.get());
 
 
         return ResponseEntity.ok(board.toResponse());
@@ -103,12 +90,8 @@ public class BoardController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBoard(
-            @AuthenticationPrincipal MyUserDetails myUserDetails,
             @PathVariable Long id
     ) {
-        if (myUserDetails == null) {
-            throw new Exception401("인증이 되지 않았습니다.");
-        }
 
         Optional<Board> optionalBoard = boardService.getBoard(id);
         if (optionalBoard.isEmpty()) {

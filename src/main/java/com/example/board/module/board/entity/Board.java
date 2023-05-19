@@ -4,6 +4,7 @@ import com.example.board.module.board.dto.BoardDTO;
 import com.example.board.module.board.enums.BoardStatus;
 import com.example.board.module.board.response.BoardResponse;
 import com.example.board.module.common.jpa.BaseTime;
+import com.example.board.module.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,15 +29,20 @@ public class Board extends BaseTime {
     @Comment("게시물 내용")
     private String content;
 
+    @Comment("작성자")
+    @ManyToOne
+    private User user;
+
     @Comment("게시물 상태")
     @Enumerated(EnumType.STRING)
     private BoardStatus status;
 
     @Builder
-    public Board(Long id, String title, String content, BoardStatus status) {
+    public Board(Long id, String title, String content, User user, BoardStatus status) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.user = user;
         this.status = status;
     }
 
