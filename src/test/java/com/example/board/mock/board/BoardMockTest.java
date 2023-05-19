@@ -1,5 +1,6 @@
 package com.example.board.mock.board;
 
+import com.example.board.config.SecurityConfig;
 import com.example.board.module.board.controller.BoardController;
 import com.example.board.module.board.entity.Board;
 import com.example.board.module.board.enums.BoardStatus;
@@ -11,11 +12,14 @@ import com.example.board.module.user.controller.UserController;
 import com.example.board.module.user.entity.User;
 import com.example.board.module.user.enums.UserStatus;
 import com.example.board.module.user.service.UserService;
+import com.example.board.security.WithMockCustomUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -38,6 +43,7 @@ import java.util.Optional;
 
 @WebMvcTest(BoardController.class)
 @MockBean(JpaMetamodelMappingContext.class)
+@Import(SecurityConfig.class)
 public class BoardMockTest {
     @Autowired
     private MockMvc mvc;
@@ -48,7 +54,6 @@ public class BoardMockTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    @WithMockUser(username = "kkr", roles = "USER")
     void getBoardListAndPage() throws Exception {
         Pageable pageable = PageRequest.of(1, 10);
         Page<Board> page = new PageImpl<>(
@@ -105,7 +110,6 @@ public class BoardMockTest {
     }
 
     @Test
-    @WithMockUser(username = "kkr", roles = "USER")
     void getBoardFail() throws Exception {
         // given
         Long id = 0L;
@@ -127,7 +131,6 @@ public class BoardMockTest {
     }
 
     @Test
-    @WithMockUser(username = "kkr", roles = "USER")
     void getBoard() throws Exception {
         // given
         Long id = 1L;
@@ -166,7 +169,7 @@ public class BoardMockTest {
     }
 
     @Test
-    @WithMockUser(username = "kkr", roles = "USER")
+    @WithMockCustomUser()
     void saveBoardFail() throws Exception {
         // given
         BoardSaveRequest request = new BoardSaveRequest("", "첫 번째 게시물 내용");
@@ -190,7 +193,7 @@ public class BoardMockTest {
 
 
     @Test
-    @WithMockUser(username = "kkr", roles = "USER")
+    @WithMockCustomUser()
     void saveBoard() throws Exception {
         // given
         BoardSaveRequest request = new BoardSaveRequest("첫 번째 게시물 입니다.", "첫 번째 게시물 내용");

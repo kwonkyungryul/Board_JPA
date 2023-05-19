@@ -1,8 +1,10 @@
 package com.example.board.module.user.service;
 
 import com.example.board.auth.session.MyUserDetails;
+import com.example.board.module.common.jpa.RoleType;
 import com.example.board.module.user.dto.UserDTO;
 import com.example.board.module.user.entity.User;
+import com.example.board.module.user.enums.UserStatus;
 import com.example.board.module.user.repository.UserRepository;
 import com.example.board.module.user.request.UserSaveRequest;
 import com.example.board.module.user.response.UserResponse;
@@ -18,8 +20,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Optional<User> getUser(Long id) {
-        return null;
+    public Optional<User> getUser(User user) {
+        return userRepository.findById(user.getId());
     }
 
     public User save(UserSaveRequest request) {

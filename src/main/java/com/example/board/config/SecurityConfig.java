@@ -81,9 +81,9 @@ public class SecurityConfig {
         // 11. 인증, 권한 필터 설정
         http.authorizeHttpRequests(
                 authorize -> authorize
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/board", "/board/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
         );
 
