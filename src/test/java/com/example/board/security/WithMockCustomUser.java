@@ -26,4 +26,6 @@ import java.lang.annotation.RetentionPolicy;
 public @interface WithMockCustomUser {
 	String id() default "user";
 
+	String role() default "USER";
+
 }

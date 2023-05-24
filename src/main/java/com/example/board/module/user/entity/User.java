@@ -1,7 +1,7 @@
 package com.example.board.module.user.entity;
 
 import com.example.board.module.common.jpa.BaseTime;
-import com.example.board.module.common.jpa.RoleType;
+import com.example.board.module.common.enums.RoleType;
 import com.example.board.module.user.dto.UserDTO;
 import com.example.board.module.user.enums.UserStatus;
 import com.example.board.module.user.response.UserResponse;

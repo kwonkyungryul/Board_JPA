@@ -1,23 +1,21 @@
 package com.example.board.mock.board;
 
 import com.example.board.config.SecurityConfig;
+import com.example.board.consts.BoardConst;
 import com.example.board.module.board.controller.BoardController;
 import com.example.board.module.board.entity.Board;
 import com.example.board.module.board.enums.BoardStatus;
 import com.example.board.module.board.request.BoardSaveRequest;
 import com.example.board.module.board.request.BoardUpdateRequest;
 import com.example.board.module.board.service.BoardService;
-import com.example.board.module.common.jpa.RoleType;
-import com.example.board.module.user.controller.UserController;
+import com.example.board.module.common.enums.RoleType;
 import com.example.board.module.user.entity.User;
 import com.example.board.module.user.enums.UserStatus;
-import com.example.board.module.user.service.UserService;
 import com.example.board.security.WithMockCustomUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -26,18 +24,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,58 +52,34 @@ public class BoardMockTest {
 
     @Test
     void getBoardListAndPage() throws Exception {
-        Pageable pageable = PageRequest.of(1, 10);
-        Page<Board> page = new PageImpl<>(
-                List.of(
-                        new Board(
-                                1L,
-                                "첫 번째 게시물 입니다.",
-                                "첫 번째 게시물 내용",
-                                new User(
-                                        1L,
-                                        "kkr",
-                                        "1234",
-                                        "kkr@nate.com",
-                                        RoleType.USER,
-                                        UserStatus.ACTIVE
-                                ),
-                                BoardStatus.ACTIVE
-                        ),
-                        new Board(
-                                2L,
-                                "두 번째 게시물 입니다.",
-                                "두 번째 게시물 내용",
-                                new User(
-                                        2L,
-                                        "derek",
-                                        "1234",
-                                        "derek@nate.com",
-                                        RoleType.USER,
-                                        UserStatus.ACTIVE
-                                ),
-                                BoardStatus.ACTIVE
-                        )
-                )
-        );
+        Board board = BoardConst.board;
+        Pageable pageable = BoardConst.pageRequest;
+        LocalDateTime now = LocalDateTime.now();
+        board.changeCreatedDate(now);
+        Page<Board> boardPage = new PageImpl<>(List.of(board), pageable, 1);
 
         // given
-        Long id = 1L;
-        given(this.boardService.getBoardListAndPage(pageable)).willReturn(page);
+        given(this.boardService.getBoardListAndPage(pageable)).willReturn(boardPage);
 
         // when
         ResultActions perform = this.mvc.perform(
-                get("/board?page={page}&size={size}", 1, 10)
+                get("/board")
+                        .param("page", String.valueOf(pageable.getPageNumber()))
+                        .param("size", String.valueOf(pageable.getPageSize()))
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
         );
 
         // then
         perform.andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$.content[0].id").value(1))
-                .andExpect(jsonPath("$.content[0].title").value("첫 번째 게시물 입니다."))
-                .andExpect(jsonPath("$.content[0].content").value("첫 번째 게시물 내용"))
-                .andExpect(jsonPath("$.content[1].id").value(2))
-                .andExpect(jsonPath("$.content[1].title").value("두 번째 게시물 입니다."))
-                .andExpect(jsonPath("$.content[1].content").value("두 번째 게시물 내용"));
+                .andExpect(jsonPath("$._embedded.boards[0].id").value(board.getId()))
+                .andExpect(jsonPath("$._embedded.boards[0].title").value(board.getTitle()))
+                .andExpect(jsonPath("$._embedded.boards[0].content").value(board.getContent()))
+                .andExpect(jsonPath("$._embedded.boards[0].createDate").value(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+                .andExpect(jsonPath("$._embedded.boards[0].user.id").value(board.getUser().getId()))
+                .andExpect(jsonPath("$._embedded.boards[0].user.username").value(board.getUser().getUsername()))
+                .andExpect(jsonPath("$._embedded.boards[0].user.email").value(board.getUser().getEmail()))
+                .andExpect(jsonPath("$._embedded.boards[0].user.createDate").value(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
     }
 
     @Test
@@ -133,25 +106,13 @@ public class BoardMockTest {
     @Test
     void getBoard() throws Exception {
         // given
-        Long id = 1L;
+        Board board = BoardConst.board;
+        LocalDateTime now = LocalDateTime.now();
+        board.changeCreatedDate(now);
+        Long id = board.getId();
         given(this.boardService.getBoard(id))
                 .willReturn(
-                        Optional.of(
-                                new Board(
-                                        1L,
-                                        "첫 번째 게시물 입니다.",
-                                        "첫 번째 게시물 내용",
-                                        new User(
-                                                1L,
-                                                "kkr",
-                                                "1234",
-                                                "kkr@nate.com",
-                                                RoleType.USER,
-                                                UserStatus.ACTIVE
-                                        ),
-                                        BoardStatus.ACTIVE
-                                )
-                        )
+                        Optional.of(board)
                 );
 
         // when
@@ -163,9 +124,16 @@ public class BoardMockTest {
         perform
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.title").value("첫 번째 게시물 입니다."))
-                .andExpect(jsonPath("$.content").value("첫 번째 게시물 내용"));
+                .andExpect(jsonPath("$.id").value(board.getId()))
+                .andExpect(jsonPath("$.title").value(board.getTitle()))
+                .andExpect(jsonPath("$.content").value(board.getContent()))
+                .andExpect(jsonPath("$.createDate").value(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+                .andExpect(jsonPath("$.user.id").value(board.getUser().getId()))
+                .andExpect(jsonPath("$.user.username").value(board.getUser().getUsername()))
+                .andExpect(jsonPath("$.user.email").value(board.getUser().getEmail()))
+                .andExpect(jsonPath("$.user.createDate").value(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+                .andExpect(jsonPath("$.user._links").exists())
+                .andExpect(jsonPath("$._links").exists());
     }
 
     @Test
@@ -177,7 +145,6 @@ public class BoardMockTest {
         // when
         ResultActions perform = this.mvc.perform(
                 post("/board")
-                        .with(csrf())
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -196,29 +163,14 @@ public class BoardMockTest {
     @WithMockCustomUser()
     void saveBoard() throws Exception {
         // given
+        Board board = BoardConst.board;
         BoardSaveRequest request = new BoardSaveRequest("첫 번째 게시물 입니다.", "첫 번째 게시물 내용");
         given(this.boardService.save(request))
-                .willReturn(
-                        new Board(
-                                1L,
-                                "첫 번째 게시물 입니다.",
-                                "첫 번째 게시물 내용",
-                                new User(
-                                        1L,
-                                        "kkr",
-                                        "1234",
-                                        "kkr@nate.com",
-                                        RoleType.USER,
-                                        UserStatus.ACTIVE
-                                ),
-                                BoardStatus.ACTIVE
-                        )
-                );
+                .willReturn(board);
 
         // when
         ResultActions perform = this.mvc.perform(
                 post("/board")
-                        .with(csrf())
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -235,7 +187,7 @@ public class BoardMockTest {
     }
 
     @Test
-    @WithMockUser(username = "kkr", roles = "USER")
+    @WithMockCustomUser()
     void updateBoardValidFail() throws Exception {
         // given
         Long id = 0L;
@@ -244,7 +196,6 @@ public class BoardMockTest {
         // when
         ResultActions perform = this.mvc.perform(
                 put("/board/{id}", id)
-                        .with(csrf())
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -259,7 +210,7 @@ public class BoardMockTest {
     }
 
     @Test
-    @WithMockUser(username = "kkr", roles = "USER")
+    @WithMockCustomUser()
     void updateBoardEnumValidFail() throws Exception {
         // given
         Long id = 0L;
@@ -268,7 +219,6 @@ public class BoardMockTest {
         // when
         ResultActions perform = this.mvc.perform(
                 put("/board/{id}", id)
-                        .with(csrf())
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -283,7 +233,7 @@ public class BoardMockTest {
     }
 
     @Test
-    @WithMockUser(username = "kkr", roles = "USER")
+    @WithMockCustomUser()
     void updateNotFoundBoard() throws Exception {
         // given
         Long id = 0L;
@@ -293,7 +243,6 @@ public class BoardMockTest {
         // when
         ResultActions perform = this.mvc.perform(
                 put("/board/{id}", id)
-                        .with(csrf())
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -306,27 +255,13 @@ public class BoardMockTest {
     }
 
     @Test
-    @WithMockUser(username = "kkr", roles = "USER")
+    @WithMockCustomUser()
     void updateBoard() throws Exception {
         // given
-        Long id = 1L;
+        Board board = BoardConst.board;
+        Long id = board.getId();
         BoardUpdateRequest request = new BoardUpdateRequest("첫 번째 게시물 수정된 제목입니다.", "첫 번째 게시물 수정된 내용입니다.", "DELETE");
-        Optional<Board> optionalBoard = Optional.of(
-                new Board(
-                        1L,
-                        "첫 번째 게시물 입니다.",
-                        "첫 번째 게시물 내용",
-                        new User(
-                                1L,
-                                "kkr",
-                                "1234",
-                                "kkr@nate.com",
-                                RoleType.USER,
-                                UserStatus.ACTIVE
-                        ),
-                        BoardStatus.ACTIVE
-                )
-        );
+        Optional<Board> optionalBoard = Optional.of(board);
         given(this.boardService.getBoard(id)).willReturn(optionalBoard);
         given(this.boardService.update(request, optionalBoard.get())).willReturn(
                 new Board(
@@ -348,7 +283,6 @@ public class BoardMockTest {
         // when
         ResultActions perform = this.mvc.perform(
                 put("/board/{id}", id)
-                        .with(csrf())
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -363,41 +297,44 @@ public class BoardMockTest {
                 .andExpect(jsonPath("$.content").value("첫 번째 게시물 수정된 내용입니다."));
     }
 
-//    @Test
-//    @WithMockUser(username = "kkr", roles = "USER")
-//    void deleteBoardFail() throws Exception {
-//        // given
-//        Long id = 0L;
-//        given(this.boardService.getBoard(id)).willReturn(Optional.empty());
-//
-//        // when
-//        ResultActions perform = this.mvc.perform(
-//                delete("/board/{id}", id).with(csrf())
-//        );
-//
-//        // then
-//        perform
-//                .andExpect(status().isBadRequest())
-//                .andDo(print())
-//                .andExpect(jsonPath("$.detail").value("게시물 정보를 찾을 수 없습니다."));
-//    }
-//
-//    @Test
-//    @WithMockUser(username = "kkr", roles = "USER")
-//    void deleteBoard() throws Exception {
-//        // given
-//        Long id = 1L;
-//        given(this.boardService.getBoard(id)).willReturn(Optional.empty());
-//
-//        // when
-//        ResultActions perform = this.mvc.perform(
-//                delete("/board/{id}", id).with(csrf())
-//        );
-//
-//        // then
-//        perform
-//                .andExpect(status().isBadRequest())
-//                .andDo(print());
-////                .andExpect(jsonPath("$.detail".value(""));
-//    }
+    @Test
+    @WithMockCustomUser()
+    void deleteBoardFail() throws Exception {
+        // given
+        Long id = 0L;
+        given(this.boardService.getBoard(id)).willReturn(Optional.empty());
+
+        // when
+        ResultActions perform = this.mvc.perform(
+                delete("/board/{id}", id)
+        );
+
+        // then
+        perform
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andExpect(jsonPath("$.detail").value("게시물 정보를 찾을 수 없습니다."));
+    }
+
+    @Test
+    @WithMockCustomUser()
+    void deleteBoard() throws Exception {
+        // given
+        Board board = BoardConst.board;
+        Long id = 1L;
+        given(this.boardService.getBoard(id)).willReturn(
+                Optional.of(board)
+        );
+
+        // when
+        ResultActions perform = this.mvc.perform(
+                delete("/board/{id}", id)
+        );
+
+        // then
+        perform
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.message").value("게시물 삭제가 완료되었습니다."));
+    }
 }

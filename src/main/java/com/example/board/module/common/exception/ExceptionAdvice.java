@@ -20,8 +20,8 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(Exception401.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    ProblemDetail onException400(Exception401 exception401) {
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    ProblemDetail onException401(Exception401 exception401) {
         return ProblemDetail.forStatusAndDetail(
                 HttpStatusCode.valueOf(HttpStatus.UNAUTHORIZED.value()),
                 exception401.getMessage()
@@ -29,8 +29,8 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(Exception403.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    ProblemDetail onException400(Exception403 exception403) {
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    ProblemDetail onException403(Exception403 exception403) {
         return ProblemDetail.forStatusAndDetail(
                 HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()),
                 exception403.getMessage()

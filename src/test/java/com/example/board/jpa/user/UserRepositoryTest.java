@@ -1,6 +1,6 @@
 package com.example.board.jpa.user;
 
-import com.example.board.module.common.jpa.RoleType;
+import com.example.board.module.common.enums.RoleType;
 import com.example.board.module.user.entity.User;
 import com.example.board.module.user.enums.UserStatus;
 import com.example.board.module.user.repository.UserRepository;

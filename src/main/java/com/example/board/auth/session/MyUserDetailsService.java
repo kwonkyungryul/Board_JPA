@@ -1,6 +1,7 @@
 package com.example.board.auth.session;
 
 import com.example.board.module.user.entity.User;
+import com.example.board.module.user.enums.UserStatus;
 import com.example.board.module.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -25,7 +26,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User userPS = userRepository.findByUsername(username).orElseThrow(
+        User userPS = userRepository.findByUsernameAndStatusNot(username, UserStatus.DELETE).orElseThrow(
                 () -> new InternalAuthenticationServiceException("인증 실패")
         );
         return new MyUserDetails(userPS);

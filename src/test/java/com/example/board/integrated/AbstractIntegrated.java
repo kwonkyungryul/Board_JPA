@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -67,7 +66,7 @@ public class AbstractIntegrated {
             LoginRequest loginDTO = new LoginRequest("kkr", "1234");
 
             ResultActions perform = this.mockMvc.perform(
-                    post("/users/login")
+                    post("/login")
                             .content(objectMapper.writeValueAsString(loginDTO))
                             .accept(MediaType.APPLICATION_JSON_VALUE)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -75,7 +74,7 @@ public class AbstractIntegrated {
 
             MvcResult mvcResult = perform.andReturn();
             MockHttpServletResponse response = mvcResult.getResponse();
-            return response.getHeader("Authorization");
+            return "Bearer " + response.getHeader("Authorization");
         } catch (Exception e) {
             return "";
         }

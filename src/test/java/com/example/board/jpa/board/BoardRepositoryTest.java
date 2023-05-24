@@ -3,7 +3,7 @@ package com.example.board.jpa.board;
 import com.example.board.module.board.entity.Board;
 import com.example.board.module.board.enums.BoardStatus;
 import com.example.board.module.board.repository.BoardRepository;
-import com.example.board.module.common.jpa.RoleType;
+import com.example.board.module.common.enums.RoleType;
 import com.example.board.module.user.entity.User;
 import com.example.board.module.user.enums.UserStatus;
 import org.junit.jupiter.api.Assertions;

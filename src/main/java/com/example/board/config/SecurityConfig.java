@@ -13,7 +13,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -44,6 +46,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 1. CSRF 해제
         http.csrf().disable(); // postman 접근해야 함!! - CSR 할때!!
@@ -67,23 +74,21 @@ public class SecurityConfig {
         http.apply(new CustomSecurityFilterManager());
 
         // 8. 인증 실패 처리
-        http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
+        http
+            .exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
             log.warn("인증되지 않은 사용자가 자원에 접근하려 합니다 : "+authException.getMessage());
-            MyFilterResponseUtil.unAuthorized(response, new Exception401("인증되지 않았습니다"));
-        });
-
-        // 10. 권한 실패 처리
-        http.exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
+            MyFilterResponseUtil.result(HttpStatus.UNAUTHORIZED, request, response, new Exception401("인증되지 않았습니다"));
+        })
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
             log.warn("권한이 없는 사용자가 자원에 접근하려 합니다 : "+accessDeniedException.getMessage());
-            MyFilterResponseUtil.forbidden(response, new Exception403("권한이 없습니다"));
+            MyFilterResponseUtil.result(HttpStatus.FORBIDDEN, request, response, new Exception403("권한이 없습니다"));
         });
 
         // 11. 인증, 권한 필터 설정
         http.authorizeHttpRequests(
                 authorize -> authorize
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/board", "/board/{id}").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN")
+                        .requestMatchers("/board", "/board/{id}", "/signup", "/signIn").permitAll()
                         .anyRequest().authenticated()
         );
 

@@ -1,6 +1,8 @@
 package com.example.board.module.board.controller;
 
+import com.example.board.module.board.BoardModelAssembler;
 import com.example.board.module.board.dto.BoardDTO;
+import com.example.board.module.board.dto.BoardModel;
 import com.example.board.module.board.entity.Board;
 import com.example.board.module.board.enums.BoardConst;
 import com.example.board.module.board.request.BoardSaveRequest;
@@ -12,11 +14,14 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -30,29 +35,34 @@ public class BoardController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<BoardDTO>> getBoardListAndPage(Pageable pageable) {
-        Page<Board> page = boardService.getBoardListAndPage(pageable);
-        List<BoardDTO> content = page.getContent()
-                .stream()
-                .map(Board::toDTO)
-                .toList();
+    public ResponseEntity<PagedModel<BoardModel>> getBoardListAndPage(
+            Pageable pageable,
+            PagedResourcesAssembler<Board> assembler
+    ) {
+        Page<Board> boardListAndPage = boardService.getBoardListAndPage(pageable);
+        System.out.println(boardListAndPage.getContent().get(0).getContent());
 
-        return ResponseEntity.ok(new PageImpl<>(content, pageable, page.getTotalElements()));
+        return ResponseEntity.ok(
+                assembler.toModel(
+                        boardListAndPage,
+                        new BoardModelAssembler()
+                )
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BoardDTO> getBoard(@PathVariable Long id) {
+    public ResponseEntity<BoardModel> getBoard(@PathVariable Long id) {
         Optional<Board> optionalBoard = boardService.getBoard(id);
 
         if (optionalBoard.isEmpty()) {
             throw new Exception400(BoardConst.notFound);
         }
 
-        return ResponseEntity.ok(optionalBoard.get().toDTO());
+        return ResponseEntity.ok(new BoardModelAssembler().toModel(optionalBoard.get()));
     }
 
     @PostMapping
-    public ResponseEntity<BoardResponse> saveBoard(
+    public ResponseEntity<BoardModel> saveBoard(
             @Valid @RequestBody BoardSaveRequest request,
             Errors errors
     ) {
@@ -61,13 +71,11 @@ public class BoardController {
             throw new Exception400(errors.getAllErrors().get(0).getDefaultMessage());
         }
 
-        Board board = boardService.save(request);
-
-        return ResponseEntity.ok(board.toResponse());
+        return ResponseEntity.ok(new BoardModelAssembler().toModel(boardService.save(request)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BoardResponse> saveBoard(
+    public ResponseEntity<BoardModel> updateBoard(
             @PathVariable Long id,
             @Valid @RequestBody BoardUpdateRequest request,
             Errors errors
@@ -82,14 +90,15 @@ public class BoardController {
             throw new Exception400(BoardConst.notFound);
         }
 
-        Board board = boardService.update(request, optionalBoard.get());
-
-
-        return ResponseEntity.ok(board.toResponse());
+        return ResponseEntity.ok(
+                new BoardModelAssembler().toModel(
+                        boardService.update(request, optionalBoard.get())
+                )
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBoard(
+    public ResponseEntity<Map<String, String>> deleteBoard(
             @PathVariable Long id
     ) {
 
@@ -99,6 +108,6 @@ public class BoardController {
         }
 
         boardService.deleteBoard(optionalBoard.get());
-        return ResponseEntity.ok("삭제가 완료되었습니다.");
+        return ResponseEntity.ok(Map.of("message", "게시물 삭제가 완료되었습니다."));
     }
 }

@@ -1,4 +1,4 @@
-package com.example.board.module.common.jpa;
+package com.example.board.module.common.enums;
 
 /**
  * USER 유저

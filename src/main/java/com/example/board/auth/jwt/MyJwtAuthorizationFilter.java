@@ -4,7 +4,7 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.board.auth.session.MyUserDetails;
-import com.example.board.module.common.jpa.RoleType;
+import com.example.board.module.common.enums.RoleType;
 import com.example.board.module.user.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

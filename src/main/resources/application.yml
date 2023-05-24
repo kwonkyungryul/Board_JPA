@@ -21,4 +21,8 @@ server:
   servlet:
       encoding:
           force-response: true
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

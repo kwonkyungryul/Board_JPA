@@ -16,7 +16,7 @@ import org.hibernate.annotations.Comment;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "BOARD_LIST")
+@Table(name = "BOARDS")
 public class Board extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

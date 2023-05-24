@@ -19,17 +19,10 @@ package com.example.board.security;
 
 import com.example.board.auth.session.MyUserDetails;
 import com.example.board.consts.UserConst;
-import com.example.board.module.common.jpa.RoleType;
-import com.example.board.module.user.enums.UserStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-
-
-import java.util.List;
 
 public class WithMockCustomAccountSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
 
