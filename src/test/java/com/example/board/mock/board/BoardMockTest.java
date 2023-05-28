@@ -11,6 +11,7 @@ import com.example.board.module.board.service.BoardService;
 import com.example.board.module.common.enums.RoleType;
 import com.example.board.module.user.entity.User;
 import com.example.board.module.user.enums.UserStatus;
+import com.example.board.module.user.service.UserService;
 import com.example.board.security.WithMockCustomUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,9 @@ public class BoardMockTest {
     @MockBean
     private BoardService boardService;
 
+    @MockBean
+    private UserService userService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
@@ -54,7 +58,7 @@ public class BoardMockTest {
         Board board = BoardConst.board;
         Pageable pageable = BoardConst.pageRequest;
         LocalDateTime now = LocalDateTime.now();
-        board.changeCreatedDate(now);
+//        board.changeCreatedDate(now);
         Page<Board> boardPage = new PageImpl<>(List.of(board), pageable, 1);
 
         // given
@@ -107,7 +111,7 @@ public class BoardMockTest {
         // given
         Board board = BoardConst.board;
         LocalDateTime now = LocalDateTime.now();
-        board.changeCreatedDate(now);
+//        board.changeCreatedDate(now);
         Long id = board.getId();
         given(this.boardService.getBoard(id))
                 .willReturn(
@@ -139,8 +143,12 @@ public class BoardMockTest {
     @WithMockCustomUser()
     void saveBoardFail() throws Exception {
         // given
+        Board board = BoardConst.board;
         BoardSaveRequest request = new BoardSaveRequest("", "첫 번째 게시물 내용");
-
+        given(this.userService.getUser(board.getUser().getId()))
+                .willReturn(
+                        Optional.of(board.getUser())
+                );
         // when
         ResultActions perform = this.mvc.perform(
                 post("/board")
@@ -162,6 +170,10 @@ public class BoardMockTest {
     void saveBoard() throws Exception {
         // given
         Board board = BoardConst.board;
+        given(this.userService.getUser(board.getUser().getId()))
+                .willReturn(
+                        Optional.of(board.getUser())
+                );
         BoardSaveRequest request = new BoardSaveRequest("첫 번째 게시물 입니다.", "첫 번째 게시물 내용");
         given(this.boardService.save(request, board.getUser())).willReturn(board);
 

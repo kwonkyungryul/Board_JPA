@@ -16,12 +16,9 @@ public class CommonService {
 
     private final UserRepository userRepository;
 
-    private final MyJwtProvider provider;
 
-
-    public CommonService(UserRepository userRepository, MyJwtProvider provider) {
+    public CommonService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.provider = provider;
     }
 
     public Optional<User> findUser(LoginRequest request) {
@@ -29,6 +26,6 @@ public class CommonService {
     }
 
     public String getToken(User user) {
-        return provider.create(user);
+        return MyJwtProvider.create(user);
     }
 }

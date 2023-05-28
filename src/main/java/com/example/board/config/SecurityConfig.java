@@ -55,8 +55,8 @@ public class SecurityConfig {
         // 1. CSRF 해제
         http.csrf().disable(); // postman 접근해야 함!! - CSR 할때!!
 
-        // 2. iframe 거부
-        http.headers().frameOptions().disable();
+        // 2. 같은 도메인에서 iframe 허용 (최소한 권한)
+        http.headers().frameOptions().sameOrigin();
 
         // 3. cors 재설정
         http.cors().configurationSource(configurationSource());
