@@ -5,7 +5,7 @@ import com.example.board.module.board.enums.BoardStatus;
 import com.example.board.module.board.repository.BoardRepository;
 import com.example.board.module.board.request.BoardSaveRequest;
 import com.example.board.module.board.request.BoardUpdateRequest;
-import jakarta.validation.Valid;
+import com.example.board.module.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,8 +31,8 @@ public class BoardService {
         return boardRepository.findById(id);
     }
 
-    public Board save(BoardSaveRequest request) {
-        return boardRepository.save(request.toEntity());
+    public Board save(BoardSaveRequest request, User user) {
+        return boardRepository.save(request.toEntity(user));
     }
 
     public Board update(BoardUpdateRequest request, Board board) {

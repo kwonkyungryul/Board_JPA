@@ -1,0 +1,87 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+
+= 공통 데이터 문서
+
+== 회원가입
+
+=== 요청 정보 [HTTP]
+include::{snippets}/signUp/http-request.adoc[]
+
+=== 요청 정보 [Request Body]
+include::{snippets}/signUp/request-body.adoc[]
+
+=== 요청 정보 [Request Fields]
+include::{snippets}/signUp/request-fields.adoc[]
+
+=== 응답 정보 [HTTP]
+include::{snippets}/signUp/http-response.adoc[]
+
+
+=== 응답 정보 [성공]
+==== [Body]
+include::{snippets}/signUp/response-body.adoc[]
+
+==== [Fields]
+include::{snippets}/signUp/response-fields.adoc[]
+
+=== 응답 정보 [실패]
+==== [Body]
+include::{snippets}/signUp-fail/response-body.adoc[]
+
+==== [Fields]
+include::{snippets}/signUp-fail/response-fields.adoc[]
+
+=== CURL
+include::{snippets}/signUp/curl-request.adoc[]
+
+=== HTTPIE
+include::{snippets}/signUp/httpie-request.adoc[]
+
+
+
+
+
+
+== 로그인
+
+=== 요청 정보 [HTTP]
+include::{snippets}/signIn/http-request.adoc[]
+
+=== 요청 정보 [Request Body]
+include::{snippets}/signIn/request-body.adoc[]
+
+=== 요청 정보 [Request Fields]
+include::{snippets}/signIn/request-fields.adoc[]
+
+=== 응답 정보 [HTTP]
+include::{snippets}/signIn/http-response.adoc[]
+
+=== 응답 정보 [성공]
+==== [Body]
+include::{snippets}/signIn/response-body.adoc[]
+
+==== [Fields]
+include::{snippets}/signIn/response-fields.adoc[]
+
+=== 응답 정보 [실패]
+==== [Body]
+include::{snippets}/signIn-fail/response-body.adoc[]
+
+==== [Fields]
+include::{snippets}/signUp-fail/response-fields.adoc[]
+
+=== CURL
+include::{snippets}/signIn/curl-request.adoc[]
+
+=== HTTPIE
+include::{snippets}/signIn/httpie-request.adoc[]

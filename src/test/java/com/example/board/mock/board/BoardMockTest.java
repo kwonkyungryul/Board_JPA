@@ -20,7 +20,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
@@ -151,7 +150,6 @@ public class BoardMockTest {
         );
 
         // then
-
         perform
                 .andExpect(status().isBadRequest())
                 .andDo(print())
@@ -165,8 +163,7 @@ public class BoardMockTest {
         // given
         Board board = BoardConst.board;
         BoardSaveRequest request = new BoardSaveRequest("첫 번째 게시물 입니다.", "첫 번째 게시물 내용");
-        given(this.boardService.save(request))
-                .willReturn(board);
+        given(this.boardService.save(request, board.getUser())).willReturn(board);
 
         // when
         ResultActions perform = this.mvc.perform(

@@ -48,8 +48,6 @@ public class UserMockTest {
     @MockBean
     private UserService userService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Test
 //    @WithMockCustomUser()
     void getListFail() throws Exception {

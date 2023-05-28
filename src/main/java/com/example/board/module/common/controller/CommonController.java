@@ -4,6 +4,8 @@ import com.example.board.auth.jwt.MyJwtProvider;
 import com.example.board.module.common.exception.Exception400;
 import com.example.board.module.common.request.LoginRequest;
 import com.example.board.module.common.service.CommonService;
+import com.example.board.module.user.UserModelAssembler;
+import com.example.board.module.user.dto.UserModel;
 import com.example.board.module.user.entity.User;
 import com.example.board.module.user.enums.UserConst;
 import com.example.board.module.user.enums.UserStatus;
@@ -73,7 +75,7 @@ public class CommonController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponse> saveUser(
+    public ResponseEntity<UserModel> saveUser(
             @Valid @RequestBody UserSaveRequest request,
             Errors error
     ) {
@@ -83,6 +85,8 @@ public class CommonController {
 
         User user = userService.save(request);
 
-        return ResponseEntity.ok(user.toResponse());
+        return ResponseEntity.ok(
+                new UserModelAssembler().toModel(user)
+        );
     }
 }

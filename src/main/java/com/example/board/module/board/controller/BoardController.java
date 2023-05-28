@@ -1,26 +1,27 @@
 package com.example.board.module.board.controller;
 
+import com.example.board.auth.session.MyUserDetails;
 import com.example.board.module.board.BoardModelAssembler;
-import com.example.board.module.board.dto.BoardDTO;
 import com.example.board.module.board.dto.BoardModel;
 import com.example.board.module.board.entity.Board;
 import com.example.board.module.board.enums.BoardConst;
 import com.example.board.module.board.request.BoardSaveRequest;
 import com.example.board.module.board.request.BoardUpdateRequest;
-import com.example.board.module.board.response.BoardResponse;
 import com.example.board.module.board.service.BoardService;
 import com.example.board.module.common.exception.Exception400;
+import com.example.board.module.user.entity.User;
+import com.example.board.module.user.enums.UserConst;
+import com.example.board.module.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,8 +31,11 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    public BoardController(BoardService boardService) {
+    private final UserService userService;
+
+    public BoardController(BoardService boardService, UserService userService) {
         this.boardService = boardService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -40,7 +44,6 @@ public class BoardController {
             PagedResourcesAssembler<Board> assembler
     ) {
         Page<Board> boardListAndPage = boardService.getBoardListAndPage(pageable);
-        System.out.println(boardListAndPage.getContent().get(0).getContent());
 
         return ResponseEntity.ok(
                 assembler.toModel(
@@ -63,15 +66,21 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<BoardModel> saveBoard(
+            @AuthenticationPrincipal MyUserDetails myUserDetails,
             @Valid @RequestBody BoardSaveRequest request,
             Errors errors
     ) {
+
+        Optional<User> optionalUser = userService.getUser(myUserDetails.getUser().getId());
+        if (optionalUser.isEmpty()) {
+            throw new Exception400(UserConst.notFound);
+        }
 
         if (errors.hasErrors()) {
             throw new Exception400(errors.getAllErrors().get(0).getDefaultMessage());
         }
 
-        return ResponseEntity.ok(new BoardModelAssembler().toModel(boardService.save(request)));
+        return ResponseEntity.ok(new BoardModelAssembler().toModel(boardService.save(request, optionalUser.get())));
     }
 
     @PutMapping("/{id}")

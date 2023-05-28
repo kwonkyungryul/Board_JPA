@@ -13,7 +13,78 @@ endif::[]
 
 = 유저 문서
 
+== List API
+
+=== 요청 정보[HTTP]
+include::{snippets}/user-list/http-request.adoc[]
+
+=== 요청 정보[Header]
+include::{snippets}/user-list/request-headers.adoc[]
+
+=== 요청 정보[Query Parameters]
+include::{snippets}/user-list/query-parameters.adoc[]
+
+=== 응답 정보[HTTP]
+include::{snippets}/user-list/http-response.adoc[]
+
+=== 응답 정보[Body]
+include::{snippets}/user-list/response-body.adoc[]
+
+=== 응답 정보
+==== [Field]
+include::{snippets}/user-list/response-fields.adoc[]
+
+==== [Link]
+include::{snippets}/user-list/links.adoc[]
+
+=== CURL
+include::{snippets}/user-list/curl-request.adoc[]
+
+=== HTTPIE
+include::{snippets}/user-list/httpie-request.adoc[]
+
+
+
+
 == Detail API
 
 === 요청 정보[HTTP]
-include::{snippets}/user-detail-fail/
+include::{snippets}/user-detail/http-request.adoc[]
+
+=== 요청 정보[Header]
+include::{snippets}/user-detail/request-headers.adoc[]
+
+=== 요청 정보[Path Parameters]
+include::{snippets}/user-detail/path-parameters.adoc[]
+
+=== 응답 정보[HTTP]
+include::{snippets}/user-detail/http-response.adoc[]
+
+=== 응답 정보[Body]
+include::{snippets}/user-detail/response-body.adoc[]
+
+=== 응답 정보
+==== [Field]
+include::{snippets}/user-detail/response-fields.adoc[]
+
+==== [Link]
+include::{snippets}/user-detail/links.adoc[]
+
+=== CURL
+include::{snippets}/user-detail/curl-request.adoc[]
+
+=== HTTPIE
+include::{snippets}/user-detail/httpie-request.adoc[]
+
+
+=== 응답 정보 [실패]
+* 유저가 존재하지 않을 경우
+
+=== 응답 정보[HTTP]
+include::{snippets}/user-detail-fail/http-response.adoc[]
+
+=== [fields]
+include::{snippets}/user-detail-fail/response-fields.adoc[]
+
+=== CURL
+include::{snippets}/user-detail-fail/curl-request.adoc[]
